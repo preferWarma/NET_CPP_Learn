@@ -1,0 +1,110 @@
+{
+    "files.associations": {
+        "iostream": "cpp",
+        "array": "cpp",
+        "atomic": "cpp",
+        "bit": "cpp",
+        "*.tcc": "cpp",
+        "cctype": "cpp",
+        "clocale": "cpp",
+        "cmath": "cpp",
+        "compare": "cpp",
+        "concepts": "cpp",
+        "cstdarg": "cpp",
+        "cstddef": "cpp",
+        "cstdint": "cpp",
+        "cstdio": "cpp",
+        "cstdlib": "cpp",
+        "cwchar": "cpp",
+        "cwctype": "cpp",
+        "deque": "cpp",
+        "string": "cpp",
+        "unordered_map": "cpp",
+        "vector": "cpp",
+        "exception": "cpp",
+        "algorithm": "cpp",
+        "functional": "cpp",
+        "iterator": "cpp",
+        "memory": "cpp",
+        "memory_resource": "cpp",
+        "numeric": "cpp",
+        "random": "cpp",
+        "string_view": "cpp",
+        "system_error": "cpp",
+        "tuple": "cpp",
+        "type_traits": "cpp",
+        "utility": "cpp",
+        "initializer_list": "cpp",
+        "iosfwd": "cpp",
+        "istream": "cpp",
+        "limits": "cpp",
+        "new": "cpp",
+        "numbers": "cpp",
+        "ostream": "cpp",
+        "stdexcept": "cpp",
+        "streambuf": "cpp",
+        "typeinfo": "cpp",
+        "regex": "cpp",
+        "any": "cpp",
+        "barrier": "cpp",
+        "bitset": "cpp",
+        "cfenv": "cpp",
+        "charconv": "cpp",
+        "chrono": "cpp",
+        "cinttypes": "cpp",
+        "codecvt": "cpp",
+        "complex": "cpp",
+        "condition_variable": "cpp",
+        "coroutine": "cpp",
+        "csetjmp": "cpp",
+        "csignal": "cpp",
+        "cstring": "cpp",
+        "ctime": "cpp",
+        "cuchar": "cpp",
+        "forward_list": "cpp",
+        "list": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "unordered_set": "cpp",
+        "optional": "cpp",
+        "ratio": "cpp",
+        "source_location": "cpp",
+        "fstream": "cpp",
+        "future": "cpp",
+        "iomanip": "cpp",
+        "latch": "cpp",
+        "mutex": "cpp",
+        "ranges": "cpp",
+        "scoped_allocator": "cpp",
+        "semaphore": "cpp",
+        "shared_mutex": "cpp",
+        "span": "cpp",
+        "sstream": "cpp",
+        "stop_token": "cpp",
+        "syncstream": "cpp",
+        "thread": "cpp",
+        "typeindex": "cpp",
+        "valarray": "cpp",
+        "variant": "cpp"
+    },
+    // 全局设置
+    "files.autoSave": "afterDelay", // 修改后自动保存
+    "files.autoGuessEncoding": true, // 自动检测文件编码
+    "workbench.list.smoothScrolling": true, // 平滑滚动
+    "editor.cursorSmoothCaretAnimation": "on", // 平滑滚动
+    "editor.smoothScrolling": true, // 平滑滚动
+    "editor.cursorBlinking": "smooth", // 光标闪烁
+    "editor.mouseWheelZoom": true, // 鼠标滚轮缩放
+    "editor.formatOnPaste": true, // 控制编辑器是否自动格式化粘贴的内容
+    "editor.formatOnType": true, // 控制编辑器在键入一行后是否自动格式化该行
+    "editor.formatOnSave": true, // 每次保存时自动格式化
+    "editor.wordWrap": "on", // 自动换行
+    "editor.guides.bracketPairs": true, // 显示括号匹配参考线
+    "editor.suggest.snippetsPreventQuickSuggestions": false, // 控制活动代码段是否阻止快速建议。
+    "editor.acceptSuggestionOnEnter": "smart", // 控制是否在按下回车键时，自动接受建议。
+    "editor.suggestSelection": "recentlyUsed", // 控制建议选项是否自动选择第一个建议。
+    "debug.showBreakpointsInOverviewRuler": true, // 控制是否在概览栏中显示断点。
+    // "C_Cpp.formatting": "vcFormat", // 控制C/C++代码格式化的格式。
+    "C_Cpp.default.cppStandard": "c++20",
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools", // 控制C/C++代码的默认C++标准。
+}
