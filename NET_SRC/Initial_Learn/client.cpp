@@ -30,12 +30,12 @@ main(int agrc, char* argv[]) {
 
     // 2. 向服务器发起连接请求
     hostent* h = gethostbyname(argv[1]); // 用于存放服务端IP的结构体
-    if (h == 0) {
+    if (h == nullptr) {
         std::cerr << "get host failed" << std::endl;
         close(sockfd);
         return -1;
     }
-    struct sockaddr_in server_addr; // 用于存放服务端IP和端口的结构体。
+    sockaddr_in server_addr; // 用于存放服务端IP和端口的结构体。
     memset(&server_addr, 0, sizeof(server_addr));
     server_addr.sin_family = AF_INET;
     memcpy(&server_addr.sin_addr, h->h_addr, (size_t)h->h_length); // 指定服务端的IP地址。
@@ -51,10 +51,9 @@ main(int agrc, char* argv[]) {
     char buffer[1024];
     constexpr size_t ChatSize = 3; // 通讯次数
     for (size_t i = 0; i < ChatSize; ++i) {
-        long i_ret;
         std::snprintf(buffer, sizeof(buffer), "这是第条%zu信息, 编号为%zu:", i, i);
         // 发送请求报文
-        if ((i_ret = send(sockfd, buffer, strlen(buffer), 0)) <= 0) {
+        if (send(sockfd, buffer, strlen(buffer), 0) <= 0) {
             std::cerr << "send failed!" << std::endl;
             break;
         }
@@ -62,12 +61,12 @@ main(int agrc, char* argv[]) {
         memset(buffer, 0, sizeof(buffer));
 
         // 接受服务端的回应报文, 如果没有收到则阻塞等待
-        if ((i_ret = recv(sockfd, buffer, sizeof(buffer), 0)) <= 0) {
+        if (recv(sockfd, buffer, sizeof(buffer), 0) <= 0) {
             std::cerr << "recv failed" << std::endl;
             break;
         }
         std::cout << "收到" << buffer << std::endl;
-        sleep(1);
+        sleep(1); // 模拟客户端与服务端的交互时间间隔
     }
 
     // 4. 关闭连接
