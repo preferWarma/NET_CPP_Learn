@@ -1,4 +1,4 @@
-set(src_tcp tcp_client.cpp)
+set(src_tcp tcp_client.cpp tcp_server.cpp)
 add_library(tcp_lib OBJECT ${src_tcp}) # 设置库名以及库对应的cpp文件
 
 add_executable(Server_1 server.cpp)

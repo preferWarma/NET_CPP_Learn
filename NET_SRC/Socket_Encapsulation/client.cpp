@@ -5,8 +5,6 @@ client.cpp
 #include "lyf.h"
 #include "stopwatch.h"
 #include "tcp_client.h"
-#include <iostream>
-#include <string>
 
 using namespace lyf;
 

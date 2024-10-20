@@ -7,6 +7,7 @@ TCP通信的客户端类
 
 #include <arpa/inet.h>
 #include <cstddef>
+#include <cstring>
 #include <netdb.h>
 #include <string>
 #include <string_view>
@@ -45,6 +46,7 @@ public:
     close() {
         if (hasConnected()) {
             ::close(m_fd);
+            m_fd = -1;
         }
     }
 
