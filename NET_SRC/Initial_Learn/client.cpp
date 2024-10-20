@@ -1,3 +1,7 @@
+/*
+client.cpp
+客户端程序
+*/
 #include <arpa/inet.h>
 #include <cstddef>
 #include <cstdint>
@@ -29,17 +33,23 @@ main(int agrc, char* argv[]) {
     }
 
     // 2. 向服务器发起连接请求
+    sockaddr_in server_addr; // 用于存放服务端IP和端口的结构体。
+    memset(&server_addr, 0, sizeof(server_addr));
+
+    server_addr.sin_family = AF_INET; // 指定协议
+    /*
+    如果只用IP地址来表示服务端(gethostbyname还可以通过域名来获取IP)的话,
+    可以直接使用server_addr.sin_addr = inet_addr(argv[1]);来指定服务端的IP地址
+    */
     hostent* h = gethostbyname(argv[1]); // 用于存放服务端IP的结构体
-    if (h == nullptr) {
+    if (h == 0) {
         std::cerr << "get host failed" << std::endl;
         close(sockfd);
         return -1;
     }
-    sockaddr_in server_addr; // 用于存放服务端IP和端口的结构体。
-    memset(&server_addr, 0, sizeof(server_addr));
-    server_addr.sin_family = AF_INET;
     memcpy(&server_addr.sin_addr, h->h_addr, (size_t)h->h_length); // 指定服务端的IP地址。
     server_addr.sin_port = htons((uint16_t)atoi(argv[2]));         // 指定服务端的通信端口。
+
     // 向服务器发起连接请求
     if (connect(sockfd, (sockaddr*)&server_addr, sizeof(server_addr)) != 0) {
         std::cerr << "connect error" << std::endl;

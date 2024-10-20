@@ -33,7 +33,7 @@ if (sockfd == -1) {
 hostent* h = gethostbyname(argv[1]); // 用于存放服务端IP的结构体
 ```
 
-参数中的`name`表示要查询的主机名(用`IP`地址表示), 返回值为类型`hostent`的结构体指针
+参数中的`name`表示要查询的主机名(用`IP`地址或域名表示), 返回值为类型`hostent`的结构体指针
 
 - 如果查询成功，函数返回一个指向 `hostent` 结构体的指针，该结构体包含了主机的相关信息。
 - 如果查询失败，函数返回 `NULL`
@@ -71,17 +71,23 @@ int connect(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
 
 ```cpp
 // 2.向服务器发起连接请求
+sockaddr_in server_addr; // 用于存放服务端IP和端口的结构体。
+memset(&server_addr, 0, sizeof(server_addr));
+
+server_addr.sin_family = AF_INET;    // 指定协议
+/* 
+如果只用IP地址来表示服务端(gethostbyname还可以通过域名来获取IP)的话, 
+可以直接使用server_addr.sin_addr = inet_addr(argv[1]);来指定服务端的IP地址
+*/
 hostent* h = gethostbyname(argv[1]); // 用于存放服务端IP的结构体
 if (h == 0) {
     std::cerr << "get host failed" << std::endl;
     close(sockfd);
     return -1;
 }
-sockaddr_in server_addr; // 用于存放服务端IP和端口的结构体。
-memset(&server_addr, 0, sizeof(server_addr));
-server_addr.sin_family = AF_INET;
 memcpy(&server_addr.sin_addr, h->h_addr, (size_t)h->h_length); // 指定服务端的IP地址。
 server_addr.sin_port = htons((uint16_t)atoi(argv[2]));         // 指定服务端的通信端口。
+
 // 向服务器发起连接请求
 if (connect(sockfd, (sockaddr*)&server_addr, sizeof(server_addr)) != 0) {
     std::cerr << "connect error" << std::endl;
