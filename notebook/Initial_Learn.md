@@ -1,7 +1,5 @@
 # 第一个网络通讯程序
 
-
-
 ## 一, 网络通讯的流程
 
 ![img](Initial_Learn.assets/wps2.png)
@@ -146,3 +144,138 @@ for (size_t i = 0; i < ChatSize; ++i) {
 }
 ```
 
+### 4.关闭socket连接, 释放资源
+```c
+close(sockfd);
+```
+
+## 三, 服务端代码案例解析
+### 1.创建服务端socket
+
+```c
+// 1. 创建服务端的socket
+int listenfd = socket(AF_INET, SOCK_STREAM, 0); // 服务端用来监听的socket
+if (listenfd == -1) {
+    std::cerr << "socket failed!" << std::endl;
+    return -1;
+}
+```
+### 2.把服务端用于通信的IP和端口号绑定到服务端socket上
+
+```c
+// socket中的bind函数声明
+// bind 函数通常在套接字创建后、监听或接受连接前调用。绑定操作允许套接字在特定的端口上监听传入的数据
+int bind(int sockfd, const struct sockaddr *addr, socklen_t addrlen);
+```
+- `sockfd`：要绑定的套接字的文件描述符。
+- `addr`：指向一个 `sockaddr` 结构体的指针，该结构体包含了要绑定的网络地址和端口号。
+- `addrlen`：`addr` 指向的结构体的大小。
+
+绑定成功返回0, 绑定失败返回-1
+
+```c
+// 2. 把服务端用于通信的IP和端口绑定到socket上
+sockaddr_in sever_addr;
+memset(&sever_addr, 0, sizeof(sever_addr));
+sever_addr.sin_family      = AF_INET;                        // 指定协议
+sever_addr.sin_addr.s_addr = htonl(INADDR_ANY);              // 服务端任意网卡到IP都可以用于通信
+sever_addr.sin_port        = htons((uint16_t)atoi(argv[1])); // 指定端口号
+// 绑定服务端的IP和端口
+if (bind(listenfd, (sockaddr*)&sever_addr, sizeof(sever_addr)) != 0) {
+    std::cerr << "bind failed!" << std::endl;
+    close(listenfd);
+    return -1;
+}
+```
+
+### 3.将服务端socket设置为可监听状态
+
+```c
+// listen函数声明
+// 用于将一个套接字（socket）设置为监听模式，使其能够接收连接请求
+// 确保在使用 listen 函数之前已经成功调用了 bind 函数。
+int listen(int sockfd, int backlog);
+```
+- `sockfd`：已经绑定到特定地址的套接字的文件描述符。
+- `backlog`：指定内核应该为相应套接字排队的最大挂起连接的数量
+ 
+调用成功返回0, 调用失败返回-1
+
+```c
+// 3. 将服务端socket设置为可监听状态
+if ((listen(listenfd, 5)) != 0) {
+    std::cerr << "listen failed!" << std::endl;
+    close(listenfd);
+    return -1;
+}
+```
+
+### 4.受理客户端的连接请求
+
+```c
+// accept 函数声明
+// accept用于接受客户端的连接请求。
+// 当服务器端套接字处于监听模式（由 listen 函数设置）时，accept 函数会从已完成连接的队列中取出第一个连接请求，并为该连接创建一个新的套接字。
+// 这个新的套接字用于后续与客户端通信。
+int accept(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+```
+- `sockfd`：处于监听模式的服务器端套接字的文件描述符。
+- `addr`：如果非空，`accept` 函数会填充这个 `sockaddr` 结构体，提供连接客户端的地址信息。
+- `addrlen`：指向 `addr` 结构体长度的变量的指针
+
+如果成功，返回一个新的套接字文件描述符，用于与已接受的客户端通信。失败则返回-1
+
+```c
+// 4. 受理客户端的连接请求，如果没有连接请求，则accept函数则会阻塞等待
+int clientfd = accept(listenfd, 0, 0); // clientfd为客户端连接上来的socket
+if (clientfd == -1) {
+    std::cerr << "accept failed!" << std::endl;
+    close(listenfd);
+    return -1;
+}
+std::cout << "客户端连接请求已经接受" << std::endl;
+```
+
+### 5.与客户端通信, 接收客户端发送的信息并发送返回信息
+
+```c
+// 5. 与客户端通信，接收客户端发来的信息，返回信息OK
+char buffer[1024];
+while (true) {
+    memset(buffer, 0, sizeof(buffer));
+    // 如果客户端没有发送报文, 则陷入阻塞
+    // 如果客户端断开连接, 则返回0
+    if ((recv(clientfd, buffer, sizeof(buffer), 0)) <= 0) {
+        break;
+    }
+    std::cout << "接收: " << buffer << std::endl;
+
+    // 生成回应报文
+    strcpy(buffer, "ok");
+    // 向客户端发送回应报文
+    if ((send(clientfd, buffer, strlen(buffer), 0)) <= 0) {
+        std::cerr << "send failed!" << std::endl;
+        break;
+    }
+    std::cout << "发送: " << buffer << std::endl;
+}
+```
+
+### 6.关闭socket连接, 释放资源
+```c
+// 6. 关闭资源
+close(listenfd);
+close(clientfd);
+```
+
+## 四, 运行(案例程序中, IP和端口号由main函数参数指出)
+1. 运行服务端，设置监听端口号
+```shell
+# 端口自行指定, 大于1024且不与已有的端口号冲突就行
+./server 5050
+```
+2. 运行客户端，请求连接对应的服务端的IP和端口号
+```shell
+# IP地址为服务端所在的IP地址, 端口号为服务端设置的监听端口号
+./client 222.195.85.39 5050
+```
