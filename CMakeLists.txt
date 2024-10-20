@@ -37,3 +37,4 @@ add_executable(test test.cpp)
 target_link_libraries(test PUBLIC MemCheck)
 # 以下是项目中需要使用的子文件夹
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/NET_SRC/Initial_Learn)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/NET_SRC/Socket_Encapsulation)
