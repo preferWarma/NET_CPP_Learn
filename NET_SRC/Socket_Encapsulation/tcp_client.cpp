@@ -1,4 +1,7 @@
 #include "tcp_client.h"
+#include <fstream>
+#include <ios>
+#include <iostream>
 
 bool
 tcp_client::connect(std::string_view ip, unsigned short port) {
@@ -41,6 +44,40 @@ tcp_client::send(std::string_view message) {
 }
 
 bool
+tcp_client::send(void* data, size_t size) {
+    // 发送请求报文
+    if (::send(m_fd, data, size, 0) <= 0) {
+        return false;
+    }
+    return true;
+}
+
+bool
+tcp_client::send_file(std::string_view filePath, size_t fileSize) {
+    std::ifstream fin(filePath, std::ios::binary);
+    if (!fin.is_open()) {
+        return false;
+    }
+    long readn;               // 每次循环读取字节数
+    long cur_total_bytes = 0; // 当前总读取字节数
+    char buffer[1024];
+    while (true) {
+        memset(buffer, 0, sizeof(buffer));
+        readn = (fileSize - cur_total_bytes >= 1024) ? 1024 : fileSize - cur_total_bytes;
+        fin.read(buffer, readn);
+        if (!this->send(buffer, readn)) {
+            return false;
+        }
+        cur_total_bytes += readn;
+        std::cout << "readn: " << readn << std::endl;
+        if (cur_total_bytes == fileSize) {
+            break;
+        }
+    }
+    return true;
+}
+
+bool
 tcp_client::receive(std::string& buffer, size_t maxSize) {
     buffer.clear();
     buffer.resize(maxSize);
@@ -51,5 +88,13 @@ tcp_client::receive(std::string& buffer, size_t maxSize) {
         return false;
     }
     buffer.resize(readn);
+    return true;
+}
+
+bool
+tcp_client::receive(void* data, size_t size) {
+    if (recv(m_fd, data, size, 0) <= 0) {
+        return false;
+    }
     return true;
 }

@@ -37,9 +37,21 @@ public:
     bool
     receive(std::string& str, size_t maxSize);
 
+    // 接收客户端发送的二进制信息
+    bool
+    receive(void* data, size_t size);
+
+    // 接收客户端发送的文件信息
+    bool
+    receive_file(std::string_view filePath, size_t fileSize);
+
     // 向客户端发送回应信息
     bool
     send(std::string_view message);
+
+    // 向客户端发送二进制信息
+    bool
+    send(void* data, size_t size);
 
     // 成员函数的get
     int

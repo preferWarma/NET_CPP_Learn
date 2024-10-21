@@ -1,4 +1,7 @@
 #include "tcp_server.h"
+#include <fstream>
+#include <ios>
+#include <iostream>
 
 bool
 tcp_server::init(unsigned short port) {
@@ -58,8 +61,51 @@ tcp_server::receive(std::string& str, size_t maxSize) {
 }
 
 bool
+tcp_server::receive(void* data, size_t size) {
+    if (recv(m_client_fd, data, size, 0) <= 0) {
+        return false;
+    }
+    return true;
+}
+
+bool
+tcp_server::receive_file(std::string_view filePath, size_t fileSize) {
+    std::cout << "tcp_server::receive(filePath, fileSize)" << std::endl;
+    std::ofstream fout(filePath, std::ios::binary);
+    if (!fout.is_open()) {
+        return false;
+    }
+    long writen;              // 每次循环读取字节数
+    long cur_total_bytes = 0; // 当前总读取字节数
+    char buffer[1024];
+    while (true) {
+        memset(buffer, 0, sizeof(buffer));
+        writen = (fileSize - cur_total_bytes >= 1024) ? 1024 : fileSize - cur_total_bytes;
+        std::cout << "need write" << writen << std::endl;
+        if (!this->receive(buffer, writen)) {
+            return false;
+        }
+        fout.write(buffer, writen);
+        cur_total_bytes += writen;
+        std::cout << "writen: " << writen << std::endl;
+        if (cur_total_bytes == fileSize) {
+            break;
+        }
+    }
+    return true;
+}
+
+bool
 tcp_server::send(std::string_view message) {
     if ((::send(m_client_fd, message.data(), message.size(), 0)) <= 0) {
+        return false;
+    }
+    return true;
+}
+
+bool
+tcp_server::send(void* data, size_t size) {
+    if ((::send(m_client_fd, data, size, 0)) <= 0) {
         return false;
     }
     return true;
