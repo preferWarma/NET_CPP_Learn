@@ -32,12 +32,12 @@ main(int agrc, char* argv[]) {
     PrintTool::print_args("文件信息已经发送:", filestatus.to_string());
 
     // 2. 等待服务端的确认报文
-    receive_enum ret_enum{receive_enum::Failed};
-    if (!client.receive(&ret_enum, sizeof(ret_enum))) {
+    string s;
+    if (!client.receive(s, 2)) {
         std::cerr << "error: receive file status confirm failed!" << std::endl;
         return -1;
     }
-    if (ret_enum != receive_enum::Success) {
+    if (s != "ok") {
         std::cerr << "error: file status is not confirmed!" << std::endl;
         return -1;
     }
@@ -51,12 +51,11 @@ main(int agrc, char* argv[]) {
     PrintTool::print_args("文件内容发送完成");
 
     // 4. 接收服务端的确认报文, 表示文件传输完成
-    ret_enum = receive_enum::Failed;
-    if (!client.receive(&ret_enum, sizeof(ret_enum))) {
+    if (!client.receive(s, 2)) {
         std::cerr << "error: receive over confirm failed!" << std::endl;
         return -1;
     }
-    if (ret_enum != receive_enum::Success) {
+    if (s != "ok") {
         std::cerr << "error: over is not confirmed!" << std::endl;
         return -1;
     }

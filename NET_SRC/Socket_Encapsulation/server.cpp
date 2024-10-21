@@ -23,6 +23,7 @@ main(int argc, const char* argv[]) {
         std::cout << "客户端连接请求已经接受, 客户端IP: " << server.client_ip() << std::endl;
     } else {
         std::cerr << "accept failed!" << std::endl;
+        return -1;
     }
 
     while (true) {

@@ -14,7 +14,10 @@ Ubuntu 下使用 ls /proc/[pid]/fd 来查看进程打开的文件
 #include "stopwatch.h"
 #include "tcp_server.h"
 #include <csignal>
+#include <filesystem>
 #include <iostream>
+#include <string>
+#include <string_view>
 
 using namespace lyf;
 
@@ -46,10 +49,30 @@ ChildExit(int sig) {
     exit(0);
 }
 
+std::string
+newFilePath(const std::string& floder, const std::string& filename) {
+    using namespace std::filesystem;
+    std::string path = floder + "/" + filename;
+    size_t idx       = 1;
+
+    while (exists(path)) {
+        path = floder + "/" + filename + "_" + std::to_string(idx++);
+    }
+    return path;
+}
+
 int
 main(int argc, const char* argv[]) {
     auto_stopwatch sw(stopwatch::TimeType::ms);
-    assure(argc == 2, "argc != 2");
+    assure(argc == 3, "argc != 3, 示例: ./Server 8080 ./tmp");
+
+    // 忽略其他信号, 避免被打扰
+    for (size_t i = 1; i <= 64; ++i) {
+        signal(i, SIG_IGN);
+    }
+    // 设置父进程的结束信号
+    signal(SIGINT, FatherExit);
+    signal(SIGTERM, FatherExit);
 
     if (!server.init(atoi(argv[1]))) {
         std::cerr << "server init failed!" << std::endl;
@@ -61,15 +84,8 @@ main(int argc, const char* argv[]) {
             std::cout << "客户端连接请求已经接受, 客户端IP: " << server.client_ip() << std::endl;
         } else {
             std::cerr << "accept failed!" << std::endl;
+            return -1;
         }
-
-        // 忽略其他信号, 避免被打扰
-        for (size_t i = 1; i <= 64; ++i) {
-            signal(i, SIG_IGN);
-        }
-        // 设置父进程的结束信号
-        signal(SIGINT, FatherExit);
-        signal(SIGTERM, FatherExit);
 
         // 创建新的进程
         // pid > 0 表示此时是父进程在操作, 创建了一个子进程
@@ -96,33 +112,29 @@ main(int argc, const char* argv[]) {
             std::cerr << "error: receive file status failed!" << std::endl;
             return -1;
         }
+        cout << "文件信息已经接收:" << filestatus.to_string() << endl;
 
         // 2. 给客户端发送确认报文, 表示客户端可以发送文件了
-        receive_enum ret_enum{receive_enum::Success};
-        if (!server.send(&ret_enum, sizeof(ret_enum))) {
+        if (!server.send("ok")) {
             std::cerr << "error: send file status confirm failed!" << std::endl;
             return -1;
         }
-        PrintTool::print_args("文件信息确认报文已经发送");
+        cout << "文件信息确认报文已经发送" << endl;
 
         // 3. 接受文件内容
-        if (!server.receive_file(filestatus.path() + "(copy)", filestatus.size())) {
+        std::string fileSavePath = newFilePath(argv[2], filestatus.filename());
+        if (!server.receive_file(fileSavePath, filestatus.size())) {
             std::cerr << "error: receive file content failed!" << std::endl;
             return -1;
         }
-        string s;
-        if (!server.receive(s, 1024)) {
-            std::cerr << "error: receive file content failed!" << std::endl;
-            return -1;
-        }
-        PrintTool::print_args("文件内容接收完成");
+        cout << "文件内容接收完成" << endl;
 
         // 4. 给客户端发送确认报文, 表示文件接收完成
-        ret_enum = receive_enum::Success;
-        if (!server.send(&ret_enum, sizeof(ret_enum))) {
+        if (!server.send("ok")) {
             std::cerr << "error: send over confirm failed!" << std::endl;
         }
-        PrintTool::print_args("接收的文件存放在", filestatus.path() + "(copy)中");
+        cout << "收到的文件保存在: " << fileSavePath << endl;
+        ;
 
         // 子进程处通信理完成后需要退出, 否则子进程会回到循环开始执行accpet函数
         break;

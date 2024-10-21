@@ -54,7 +54,7 @@ tcp_client::send(void* data, size_t size) {
 
 bool
 tcp_client::send_file(std::string_view filePath, size_t fileSize) {
-    std::ifstream fin(filePath, std::ios::binary);
+    std::ifstream fin(filePath.data(), std::ios::binary);
     if (!fin.is_open()) {
         return false;
     }

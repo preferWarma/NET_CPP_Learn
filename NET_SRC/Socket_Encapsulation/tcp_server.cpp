@@ -70,8 +70,7 @@ tcp_server::receive(void* data, size_t size) {
 
 bool
 tcp_server::receive_file(std::string_view filePath, size_t fileSize) {
-    std::cout << "tcp_server::receive(filePath, fileSize)" << std::endl;
-    std::ofstream fout(filePath, std::ios::binary);
+    std::ofstream fout(filePath.data(), std::ios::binary);
     if (!fout.is_open()) {
         return false;
     }
@@ -81,13 +80,11 @@ tcp_server::receive_file(std::string_view filePath, size_t fileSize) {
     while (true) {
         memset(buffer, 0, sizeof(buffer));
         writen = (fileSize - cur_total_bytes >= 1024) ? 1024 : fileSize - cur_total_bytes;
-        std::cout << "need write" << writen << std::endl;
         if (!this->receive(buffer, writen)) {
             return false;
         }
         fout.write(buffer, writen);
         cur_total_bytes += writen;
-        std::cout << "writen: " << writen << std::endl;
         if (cur_total_bytes == fileSize) {
             break;
         }
