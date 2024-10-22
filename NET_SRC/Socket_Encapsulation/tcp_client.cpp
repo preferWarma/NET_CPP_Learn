@@ -69,7 +69,6 @@ tcp_client::send_file(std::string_view filePath, size_t fileSize) {
             return false;
         }
         cur_total_bytes += readn;
-        std::cout << "readn: " << readn << std::endl;
         if (cur_total_bytes == fileSize) {
             break;
         }

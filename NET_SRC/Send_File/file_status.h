@@ -39,7 +39,7 @@ public:
     // 序列化
     std::string
     to_string() const {
-        return std::string(m_path) + " , size: " + std::to_string(m_size);
+        return "[filename: (" + std::string(m_path) + ") size: (" + std::to_string(m_size) + ") ]";
     }
 
     // getter

@@ -14,6 +14,7 @@ Ubuntu 下使用 ls /proc/[pid]/fd 来查看进程打开的文件
 #include "stopwatch.h"
 #include "tcp_server.h"
 #include <csignal>
+#include <cstddef>
 #include <filesystem>
 #include <iostream>
 #include <string>
@@ -55,8 +56,20 @@ newFilePath(const std::string& floder, const std::string& filename) {
     std::string path = floder + "/" + filename;
     size_t idx       = 1;
 
+    // 分离文件名和后缀
+    std::string name;
+    std::string suffix;
+    auto pos = filename.rfind('.');
+    if (pos == std::string::npos) {
+        name = filename;
+    } else {
+        name   = filename.substr(0, pos);
+        suffix = filename.substr(pos);
+    }
+
     while (exists(path)) {
-        path = floder + "/" + filename + "_" + std::to_string(idx++);
+        path = floder + "/" + name + "(" + std::to_string(idx) + ")" + suffix;
+        ++idx;
     }
     return path;
 }
