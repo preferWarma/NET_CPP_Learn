@@ -16,6 +16,10 @@ tcp_server::init(unsigned short port) {
     server_addr.sin_port        = htons(port);       // 指定端口
     server_addr.sin_addr.s_addr = htonl(INADDR_ANY); // 指定IP
 
+    // 设置端口复用, 避免服务器主动断开连接时造成TIME_WAIT导致2MSL内无法使用端口的情况
+    int opt = 1;
+    setsockopt(listen_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt));
+
     // 绑定服务端的端口和IP
     if (bind(listen_fd, (sockaddr*)&server_addr, sizeof(server_addr)) == -1) {
         ::close(listen_fd);
