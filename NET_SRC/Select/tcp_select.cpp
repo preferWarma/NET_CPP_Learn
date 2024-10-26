@@ -80,12 +80,11 @@ main(int argc, char* argv[]) {
     FD_SET(listen_socket, &read_fds); // 将服务端用于监听的socket添加进位图
 
     int max_fd = listen_socket;       // 当前位图最大fd值
-    while (true) {
-        // 设置用于超时的结构体
-        timeval timeout;
-        timeout.tv_sec  = 10; // s
-        timeout.tv_usec = 0;  // us
+    timeval timeout;                  // 设置用于超时的结构体
+    timeout.tv_sec  = 10;             // s
+    timeout.tv_usec = 0;              // us
 
+    while (true) {
         // select函数会修改位图, 所以需要复制一份
         fd_set bitmap = read_fds;
 
@@ -135,7 +134,7 @@ main(int argc, char* argv[]) {
                         }
                     }
                 } else { // 接收缓冲区有数据可读
-                    PrintTool::print_args("客户端(fd:", event_fd, ")发送的数据已接收");
+                    PrintTool::print_args("收到客户端(fd:", event_fd, ")发送的数据:", buffer);
                     // 把收到的报文原封不动的返回
                     send(event_fd, buffer, strlen(buffer), 0);
                 }
