@@ -92,6 +92,7 @@ main(int argc, char* argv[]) {
         int retfds = select(max_fd + 1, &bitmap, nullptr, nullptr, &timeout);
         if (retfds < 0) {
             std::cerr << "error: select failed! " << std::endl;
+            close(listen_socket);
             return -1;
         }
         if (retfds == 0) { // 说明select超时了

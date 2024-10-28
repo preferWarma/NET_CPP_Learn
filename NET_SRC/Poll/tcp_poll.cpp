@@ -86,9 +86,10 @@ main(int argc, char* argv[]) {
         int retfds = poll(fds, max_fd + 1, timeout_ms);
         if (retfds < 0) {
             std::cerr << "error: poll failed! " << std::endl;
+            close(listen_socket);
             return -1;
         }
-        if (retfds == 0) { // 说明select超时了
+        if (retfds == 0) { // 说明poll超时了
             std::cerr << "warning: poll timeout! " << std::endl;
             continue;
         }
