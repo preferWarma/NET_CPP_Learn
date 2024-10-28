@@ -5,7 +5,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/_types/_timeval.h>
 #include <sys/fcntl.h>
 #include <sys/socket.h>
 #include <unistd.h>
@@ -119,20 +118,20 @@ main(int argc, char* argv[]) {
                     continue;
                 }
                 // 将client_fd注册到epoll中
-                ev.data.fd = listen_socket; // 指定事件的自定义数据, 会随着epoll_wait()返回的事件一起传递
+                ev.data.fd = client_fd; // 指定事件的自定义数据, 会随着epoll_wait()返回的事件一起传递
                 ev.events = EPOLLIN;        // 监听读事件
-                epoll_ctl(epoll_fd, EPOLL_CTL_ADD, listen_socket, &ev); // 注册监听事件
+                epoll_ctl(epoll_fd, EPOLL_CTL_ADD, client_fd, &ev); // 注册监听事件
 
                 PrintTool::print_args("客户端(fd:", client_fd, "ip:", inet_ntoa(client.sin_addr), ")已连接");
             } else { // 接收缓冲区有数据可读或客户端断开连接
                 char buffer[1024];
                 memset(buffer, 0, sizeof(buffer));
                 if (recv(ret_evs[i].data.fd, buffer, sizeof(buffer), 0) <= 0) { // 客户端断开连接
-                    PrintTool::print_args("客户端(fd:", ret_evs[i].data.fd, ")已断开连接");
+                    std::cout << "客户端(fd:" << ret_evs[i].data.fd << ")已断开连接" << "\n";
                     close(ret_evs[i].data.fd);
                     // 从epollfd中删除客户端的socket，如果socket被关闭了，会自动从epollfd中删除
                 } else { // 接收缓冲区有数据可读
-                    PrintTool::print_args("收到客户端(fd:", ret_evs[i].data.fd, ")发送的数据:", buffer);
+                    std::cout << "收到客户端(fd: "<< ret_evs[i].data.fd << ")发送的数据: " << buffer << "\n";
                     // 把收到的报文原封不动的返回
                     send(ret_evs[i].data.fd, buffer, strlen(buffer), 0);
                 }

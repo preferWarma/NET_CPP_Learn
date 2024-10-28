@@ -5,10 +5,8 @@
 #include <iostream>
 #include <netinet/in.h>
 #include <stdlib.h>
-#include <sys/_select.h>
-#include <sys/_types/_fd_def.h>
-#include <sys/_types/_timeval.h>
 #include <sys/fcntl.h>
+#include <sys/select.h>
 #include <sys/socket.h>
 #include <unistd.h>
 

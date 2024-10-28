@@ -21,7 +21,7 @@ main(int agrc, char* argv[]) {
     }
 
     constexpr size_t ChatSize      = 10; // 通讯次数
-    constexpr std::string QuitCode = ":q";
+    const std::string QuitCode = ":q";
     for (size_t i = 0; i < ChatSize; ++i) {
         std::cout << "(输入:q则退出)请输入需要发送的信息: ";
         std::string message;

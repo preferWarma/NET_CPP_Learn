@@ -2,7 +2,6 @@
 #include "stopwatch.h"
 #include <cstddef>
 #include <filesystem>
-#include <iostream>
 #include <optional>
 
 using namespace lyf;
